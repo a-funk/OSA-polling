@@ -10,7 +10,7 @@ import numpy as np
 import seaborn as sns
 
 
-df = pd.read_csv("approval_polllist.csv")
+df = pd.read_csv("approval_polllist.csv") #data frame
 
 sns_plot = sns.pairplot(df, size=2.5, plot_kws = {'alpha':0.1})
 sns_plot.savefig('test.png')
