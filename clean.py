@@ -3,6 +3,15 @@
 Created on Sun Feb 25 13:18:09 2018
 
 @author: yashr
+
+Usage:
+    
+from clean.py import clean
+
+df = read.csv('filename.csv')
+clean_df = clean(df)
+
+
 """
 
 import pandas as pd
@@ -17,18 +26,33 @@ approval = pd.read_csv("approval_polllist.csv") #data frame
 
 
 df = pd.read_csv('SampleSurvey.csv')
-df = df.drop([0,1],axis='index').reset_index()#drops the first two rows
 
-true_proportions = {
+
+def clean(df):
+    '''Creates a cleaned copy of the dataframe with an additional weight column.
+    Args:
+        df(`dataframe`): dataframe to be cleaned
+    Returns:
+        `dataframe`: clean copy of df
+    '''
+    
+    true_proportions = {
         'Status': {'Survey Preview':0.5, 'IP Address':0.5},
-        'DistributionChannel': {'preview':0.3, 'anonymous':0.7}
+        'DistributionChannel': {'preview':0.3, 'anonymous':0.7}, 
         }
+    
+    clean_df = preprocess(df)
+    clean_df['Weight'] = createWeights(clean_df, true_proportions)
+    
+    return clean_df
 
 
+def preprocess(df):
+    return df.drop([0,1],axis='index').reset_index()#drops the first two rows    
 
 
 def createWeights(df, true_proportions):
-    '''Calculate the weights needed to make the distribution of a dataframe match the true proportio
+    '''Calculate the weights needed to make the distribution of a dataframe match the true proportion
     Args:
         df (dataframe): dataframe of the data you want weighted
         true_proportions (dict): json-like dictionary of the proportions that df should match
@@ -59,8 +83,3 @@ def createWeights(df, true_proportions):
         result = result*df.apply(calculate_weight, axis=1, args=(colname,))
     
     return result
-
-
-
-
-df['Weight'] = createWeights(df, true_proportions)
