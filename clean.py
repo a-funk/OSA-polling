@@ -48,7 +48,12 @@ def clean(df):
 
 
 def preprocess(df):
-    return df.drop([0,1],axis='index').reset_index()#drops the first two rows    
+    '''returns a clean copy of a dataframe
+    Args:
+        df (`dataframe`): dataframe to be cleaned
+    '''
+    clean_df = df.drop([0,1],axis='index').reset_index()
+    return clean_df
 
 
 def createWeights(df, true_proportions):
