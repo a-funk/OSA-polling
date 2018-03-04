@@ -47,6 +47,8 @@ def preprocess(df):
     #get_date_columns = lambda x: 
     
     clean_df = df.drop([0,1],axis='index').reset_index()
+    string_cols = clean_df.select_dtypes(include=['object', 'category']).fillna("None")
+    clean_df[string_cols.columns] = string_cols.apply(lambda x: x.astype('category'))
     return clean_df
 
 
