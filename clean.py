@@ -86,7 +86,15 @@ def createWeights(df, true_proportions):
     return result
 
 def showCorr(df):
-    f, ax = plt.subplots(figsize=(10, 8))
-    corr = df.corr()
-    sns.heatmap(corr, mask=np.zeros_like(corr, dtype=np.bool), cmap=sns.diverging_palette(220, 10, as_cmap=True), square=True, ax=ax)
+    corr = pd.get_dummies(df).corr()
+    sns.set_style("darkgrid")   
+    sns.set_context('poster')
+    sns.set_color_codes()
+    sns.set(rc={'figure.figsize':(18,12)})
+    
+    sns.heatmap(corr, mask=np.zeros_like(corr, dtype=np.bool), 
+                cmap=sns.diverging_palette(220, 10, as_cmap=True), 
+                square=True)
+    
+    
     
