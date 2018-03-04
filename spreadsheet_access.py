@@ -7,7 +7,7 @@ Other than using the API, the script does not do much.
 Input : Script should run on an inputted DF (most likely a pandas DF)
 Output : A modified Google Docs sheet, with raw data and data analysis columns
 '''
-
+from googleapiclient import discovery
 import pandas as pd
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
@@ -20,16 +20,7 @@ client = gspread.authorize(creds)
 # Find a workbook by name and open the first sheet
 # Make sure you use the right name here.
 
-
-
 def create_csv(sp_name_1, sp_name_2, csv_name):
-    '''Writes raw data and cleaned data to the two given spreadsheets
-    Args:
-        sp_name_1(`string`): Name of the spreadsheet to write raw data to
-        sp_name_2(`string`): Name of the spreadsheet to write clean data to
-        csv_name(`string`): Filepath to the csv the raw data comes from
-    '''
-    
     sheet_one = client.open(sp_name_1).sheet1   #Named the google docs sheet "Raw Data Spreadsheet"
     sheet_two = client.open(sp_name_2).sheet1
     
