@@ -27,4 +27,4 @@ def create_csv(sp_name, csv_name):
     sheet_one.import_csv(raw_data.to_csv())
     
     clean_data = clean(raw_data)
-    sheet_one.import_csv(raw_data.to_csv())   #TODO: change this to write to a different spreadsheet 
+    sheet_one.import_csv(clean_data.to_csv())   #TODO: change this to write to a different spreadsheet 
