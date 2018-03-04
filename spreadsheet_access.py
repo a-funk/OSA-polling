@@ -19,6 +19,7 @@ client = gspread.authorize(creds)
 # Find a workbook by name and open the first sheet
 # Make sure you use the right name here.
 
-def create_raw_csv(sp_name, raw_csv_name):
+def create_csv(sp_name, csv_name):
     sheet_one = client.open(sp_name).sheet1   #Named the google docs sheet "Raw Data Spreadsheet"
-    sheet_one.import_csv(raw_csv_name)
+    sheet_one.import_csv(csv_name)
+
