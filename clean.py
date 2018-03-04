@@ -15,6 +15,8 @@ clean_df = clean(df)
 
 import pandas as pd
 import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 
 def clean(df):
@@ -80,3 +82,9 @@ def createWeights(df, true_proportions):
         result = result*df.apply(calculate_weight, axis=1, args=(colname,))
     
     return result
+
+def showCorr(df):
+    f, ax = plt.subplots(figsize=(10, 8))
+    corr = df.corr()
+    sns.heatmap(corr, mask=np.zeros_like(corr, dtype=np.bool), cmap=sns.diverging_palette(220, 10, as_cmap=True), square=True, ax=ax)
+    
