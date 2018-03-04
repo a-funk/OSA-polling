@@ -11,21 +11,10 @@ from clean.py import clean
 df = read.csv('filename.csv')
 clean_df = clean(df)
 
-
 """
 
 import pandas as pd
 import numpy as np
-import seaborn as sns
-
-
-approval = pd.read_csv("approval_polllist.csv") #data frame
-#sns_plot = sns.pairplot(df, size=2.5, plot_kws = {'alpha':0.1})
-#sns_plot.savefig('test.png')
-
-
-
-df = pd.read_csv('SampleSurvey.csv')
 
 
 def clean(df):
@@ -48,10 +37,13 @@ def clean(df):
 
 
 def preprocess(df):
-    '''returns a clean copy of a dataframe
+    '''Returns a clean copy of a dataframe
     Args:
         df (`dataframe`): dataframe to be cleaned
     '''
+    
+    #get_date_columns = lambda x: 
+    
     clean_df = df.drop([0,1],axis='index').reset_index()
     return clean_df
 
