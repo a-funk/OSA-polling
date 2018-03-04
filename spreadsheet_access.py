@@ -20,11 +20,21 @@ client = gspread.authorize(creds)
 # Find a workbook by name and open the first sheet
 # Make sure you use the right name here.
 
-def create_csv(sp_name, csv_name):
-    sheet_one = client.open(sp_name).sheet1   #Named the google docs sheet "Raw Data Spreadsheet"
+
+
+def create_csv(sp_name_1, sp_name_2, csv_name):
+    '''Writes raw data and cleaned data to the two given spreadsheets
+    Args:
+        sp_name_1(`string`): Name of the spreadsheet to write raw data to
+        sp_name_2(`string`): Name of the spreadsheet to write clean data to
+        csv_name(`string`): Filepath to the csv the raw data comes from
+    '''
+    
+    sheet_one = client.open(sp_name_1).sheet1   #Named the google docs sheet "Raw Data Spreadsheet"
+    sheet_two = client.open(sp_name_2).sheet1
     
     raw_data = pd.read_csv(csv_name)
     sheet_one.import_csv(raw_data.to_csv())
     
     clean_data = clean(raw_data)
-    sheet_one.import_csv(clean_data.to_csv())   #TODO: change this to write to a different spreadsheet 
+    sheet_two.import_csv(clean_data.to_csv())   #TODO: change this to write to a different spreadsheet 
