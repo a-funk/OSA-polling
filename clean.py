@@ -84,16 +84,23 @@ def createWeights(df, true_proportions):
     
     return result
 
-def showCorr(df):
-    corr = pd.get_dummies(df).corr()
-    sns.set_style("darkgrid")   
-    sns.set_context('poster')
-    sns.set_color_codes()
-    sns.set(rc={'figure.figsize':(18,12)})
+def showCorr(df,n=5):
+  #  corr = pd.get_dummies(df).corr()
+#    cor = get_top_abs_correlations(pd.get_dummies(clean_data))
+#    sns.set_style("darkgrid")   
+#    sns.set_context('poster')
+#    sns.set_color_codes()
+#    sns.set(rc={'figure.figsize':(18,12)})
+#    
+#    sns.heatmap(corr, mask=np.zeros_like(corr, dtype=np.bool), 
+#                cmap=sns.diverging_palette(220, 10, as_cmap=True), 
+#                square=True)
+  
+    corr = get_top_abs_correlations(pd.get_dummies(clean_data),n).reset_index()
+    corr["Pairing"] = corr['level_0'] + corr['level_1']
+    sns.barplot(data=corr,x="Pairing", y=0)
     
-    sns.heatmap(corr, mask=np.zeros_like(corr, dtype=np.bool), 
-                cmap=sns.diverging_palette(220, 10, as_cmap=True), 
-                square=True)
+    
     
 def get_redundant_pairs(df):
     '''Get diagonal and lower triangular pairs of correlation matrix'''
@@ -112,7 +119,7 @@ def get_top_abs_correlations(df, n=5):
 
     
     
-data = pd.read_csv('SampleSurvey.csv')
-clean_data = clean(data)
-showCorr(clean_data)
+#data = pd.read_csv('SampleSurvey.csv')
+#clean_data = clean(data)
+#showCorr(clean_data,n=100)
 
