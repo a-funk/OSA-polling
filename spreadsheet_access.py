@@ -24,7 +24,7 @@ import_time = datetime.datetime.now()
 
 '''
 The majority of runtime happens for import calls
-averaging somewhere between 7 - 12 seconds
+averaging somewhere between 5 - 7 seconds
 '''
 
 #---------------- API Calls to manage spreadsheet ------------------#
