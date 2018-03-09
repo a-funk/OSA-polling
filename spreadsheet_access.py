@@ -7,34 +7,53 @@ Other than using the API, the script does not do much.
 Input : Script should run on an inputted DF (most likely a pandas DF)
 Output : A modified Google Docs sheet, with raw data and data analysis columns
 '''
+
 import datetime
+
+start_time = datetime.datetime.now() #Testing runtime
+
 import googleapiclient.discovery as d_api #stands for drive api; to help manage files and whatnot
 import pandas as pd
 import gspread  #separate google api to help manage spreadsheets
 from oauth2client.service_account import ServiceAccountCredentials
 from clean import clean
 
-start_time = datetime.datetime.now() #Testing runtime
+import_time = datetime.datetime.now()
+
+
 
 '''
-The majority of runtime happens for API calls.
-Stack overflow says we should try multiprocessing and
-calling API's in parallel
+The majority of runtime happens for import calls
+averaging somewhere between 7 - 12 seconds
 '''
 
 #---------------- API Calls to manage spreadsheet ------------------#
+def authenticate():
+    scope = ['https://www.googleapis.com/auth/drive'] #This is a very dangerous scope to call, this probably should not be pushed to deployment
+    creds = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
+    client = gspread.authorize(creds)
 
-scope = ['https://spreadsheets.google.com/feeds', "https://www.googleapis.com/auth/drive"] #very dangerous scope DO NOT deploy to production
-creds = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
-client = gspread.authorize(creds)
-
+    print ("Connection authenticated")
 
 
 #----------------       File Management     -------------------------#
 
+#Returns MM-DD-YYYY
+def name_file():
+    date = datetime.date.today()
+    date = str(date)
+    date_list = date.split('-')
+    date_list = date_list[::-1]
+    tmp = date_list[0]
+    date_list[0] = date_list[1]
+    date_list[1] = tmp
+    date_str = "-".join(date_list)
+    print ("Date :", date_str)
+    return
 
-# Find a workbook by name and open the first sheet
-# Make sure you use the right name here.
+#TODO: Implement function to create new spreadsheets with correct names
+def initialize_csv(sp_type, date):
+    return
 
 def create_csv(sp_name_1, sp_name_2, csv_name):
     
@@ -44,7 +63,7 @@ def create_csv(sp_name_1, sp_name_2, csv_name):
         sp_name_2(`string`): Name of the spreadsheet to write clean data to
         csv_name(`string`): Filepath to the csv the raw data comes from
     '''
-    
+ 
     sheet_one = client.open(sp_name_1).sheet1   #Named the google docs sheet "Raw Data Spreadsheet"
     sheet_two = client.open(sp_name_2).sheet1
     print ("Connecting to sheets to edit --- DONE")
@@ -59,7 +78,18 @@ def create_csv(sp_name_1, sp_name_2, csv_name):
     print("Printing clean CSV to Google sheet --- DONE")
 
 
+#----------------            Main            ----------------------- #
+
+def __main__():
+    authenticate()
+    name_file()
+
+__main__()
+
 #----------------      Runtime Analsysis     ------------------------ #
 
 end_time = datetime.datetime.now()
-print ("RUNTIME OF :", end_time - start_time)
+
+print ("\nImport runtime is :", import_time - start_time)
+print ("Script runtime of :", end_time - import_time)
+print ("TOTAL RUNTIME OF  :", end_time - start_time)
