@@ -52,8 +52,19 @@ def name_file():
     return
 
 #TODO: Implement function to create new spreadsheets with correct names
-def initialize_csv(sp_type, date):
-    return
+def initialize_csv(sp_type):
+    clean = "Clean Datasheet "
+    raw   = "Raw Datasheet "
+
+    if sp_type == "clean":
+        clean += name_file()
+        new_clean_sheet = client.create(clean)
+        return new_clean_sheet
+    else:
+        raw += name_file()
+        new_raw_sheet = client.create(raw)
+        return raw_clean_sheet
+
 
 def create_csv(sp_name_1, sp_name_2, csv_name):
     
