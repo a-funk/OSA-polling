@@ -27,8 +27,9 @@ def clean(df):
     '''
     
     true_proportions = {
-        'Status': {'Survey Preview':0.5, 'IP Address':0.5},
-        'DistributionChannel': {'preview':0.3, 'anonymous':0.7}, 
+        'president': {'Donald Trump':1},
+        'subgroup': {'All polls':0.6, 'Adults':0.3, 'Voters':0.1}, 
+        'population': {'rv':0.4, 'a':0.3, 'lv':0.3}
         }
     
     clean_df = preprocess(df)
