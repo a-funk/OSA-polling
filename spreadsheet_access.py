@@ -12,7 +12,7 @@ import datetime
 
 start_time = datetime.datetime.now() #Testing runtime
 
-import googleapiclient.discovery as d_api #stands for drive api; to help manage files and whatnot
+#import googleapiclient.discovery as d_api #stands for drive api; to help manage files and whatnot
 import pandas as pd
 import gspread  #separate google api to help manage spreadsheets
 from oauth2client.service_account import ServiceAccountCredentials
@@ -100,9 +100,10 @@ def create_csv(sheet_names, csv_name, oauth_obj):
 #----------------            Main            ----------------------- #
 
 def __main__():
-    oauth = authenticate()
-    names = csv_names()
-    create_csv(names, 'approval_polllist.csv', oauth)
+    oauth = authenticate()  #returns an oauth object needed to verify the connection to make api calls
+    names = csv_names()     #returns a tuples of strings; ("Clean Datasheet + Date", "Raw Datasheet + Date")
+
+    create_csv(names, 'approval_polllist.csv', oauth) #initalizes 2 spreadsheets on google drive with respective clean/raw names. 
 
 __main__()
 
