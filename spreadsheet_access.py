@@ -88,13 +88,13 @@ def create_csv(sheet_names, csv_name, oauth_obj):
     print ("Connecting to sheets to edit --- DONE")
 
     raw_data = pd.read_csv(csv_name)
-    raw_sheet.import_csv(raw_data.to_csv())
+    client.import_csv(raw_sheet.id, raw_data.to_csv())
     print("Printing CSV to Google sheet --- DONE ")
 
     clean_data = clean(raw_data)
     print("Cleaning data --- DONE")
     clean_csv = clean_data.to_csv()
-    clean_sheet.import_csv(clean_csv)   #TODO: change this to write to a different spreadsheet 
+    client.import_csv(clean_sheet.id, clean_csv)   #TODO: change this to write to a different spreadsheet 
     print("Printing clean CSV to Google sheet --- DONE")
 
 #----------------            Main            ----------------------- #
