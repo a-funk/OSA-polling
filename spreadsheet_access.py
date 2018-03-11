@@ -28,17 +28,19 @@ averaging somewhere between 5 - 7 seconds
 '''
 
 #---------------- API Calls to manage spreadsheet ------------------#
+
 def authenticate():
     scope = ['https://www.googleapis.com/auth/drive'] #This is a very dangerous scope to call, this probably should not be pushed to deployment
     creds = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
     client = gspread.authorize(creds)
-
     print ("Connection authenticated")
+    return client
 
 
 #----------------       File Management     -------------------------#
 
 #Returns MM-DD-YYYY
+#Helper function that is called in initialize_csv
 def name_file():
     date = datetime.date.today()
     date = str(date)
@@ -49,51 +51,58 @@ def name_file():
     date_list[1] = tmp
     date_str = "-".join(date_list)
     print ("Date :", date_str)
-    return
+    return date_str
 
-#TODO: Implement function to create new spreadsheets with correct names
-def initialize_csv(sp_type):
-    clean = "Clean Datasheet "
-    raw   = "Raw Datasheet "
-
-    if sp_type == "clean":
-        clean += name_file()
-        new_clean_sheet = client.create(clean)
-        return new_clean_sheet
-    else:
-        raw += name_file()
-        new_raw_sheet = client.create(raw)
-        return raw_clean_sheet
-
-
-def create_csv(sp_name_1, sp_name_2, csv_name):
+#Returns names of 2 spreadsheets to create
+def csv_names():
     
-    '''Writes raw data and cleaned data to the two given spreadsheets
+    clean   = "Clean Datasheet "
+    raw     = "Raw Datasheet "
+
+    #Determines Google Spreadsheet name if sheet is clean
+    clean += name_file()
+    print("Sheet Names Initalized :",clean)
+
+    #Determines Google Spreadsheet name if sheet is raw
+    raw += name_file()
+    print("Sheet Names Initialized :",raw)
+
+    return (raw, clean)
+
+
+def create_csv(sheet_names, csv_name, oauth_obj):
+    
+    '''
+    Writes raw data and cleaned data to the two given spreadsheets
     Args:
         sp_name_1(`string`): Name of the spreadsheet to write raw data to
         sp_name_2(`string`): Name of the spreadsheet to write clean data to
         csv_name(`string`): Filepath to the csv the raw data comes from
     '''
- 
-    sheet_one = client.open(sp_name_1).sheet1   #Named the google docs sheet "Raw Data Spreadsheet"
-    sheet_two = client.open(sp_name_2).sheet1
+    client = oauth_obj
+
+    raw_sheet_name, clean_sheet_name = sheet_names
+
+    raw_sheet   = client.create(raw_sheet_name)   #Named google sheet "Raw Datasheet   + Date"
+    clean_sheet = client.create(clean_sheet_name) #Names google sheet "Clean Datasheet + Date"
     print ("Connecting to sheets to edit --- DONE")
 
     raw_data = pd.read_csv(csv_name)
-    sheet_one.import_csv(raw_data.to_csv())
+    raw_sheet.import_csv(raw_data.to_csv())
     print("Printing CSV to Google sheet --- DONE ")
 
     clean_data = clean(raw_data)
     print("Cleaning data --- DONE")
-    sheet_two.import_csv(clean_data.to_csv())   #TODO: change this to write to a different spreadsheet 
+    clean_csv = clean_data.to_csv()
+    clean_sheet.import_csv(clean_csv)   #TODO: change this to write to a different spreadsheet 
     print("Printing clean CSV to Google sheet --- DONE")
-
 
 #----------------            Main            ----------------------- #
 
 def __main__():
-    authenticate()
-    name_file()
+    oauth = authenticate()
+    names = csv_names()
+    create_csv(names, 'approval_polllist.csv', oauth)
 
 __main__()
 
