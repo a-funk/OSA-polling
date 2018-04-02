@@ -24,7 +24,7 @@ import httplib2  #library to make https requests (internet connectivity)
 import os        #OS lib - pretty self explanitory
 
 import gspread                          #separate google api to help manage spreadsheets
-from apiclient import discovery         #Various authentication libraries and drive api's
+from googleapiclient import discovery         #Various authentication libraries and drive api's
 from oauth2client import client
 from oauth2client import tools
 from oauth2client.file import Storage
@@ -112,7 +112,7 @@ def csv_names():
     return (raw, clean)
 
 
-def create_csv(sheet_names, csv_name, oauth_obj):
+def create_csv(sheet_names, csv_name = None):
     
     '''
     Writes raw data and cleaned data to the two given spreadsheets
@@ -122,14 +122,38 @@ def create_csv(sheet_names, csv_name, oauth_obj):
         csv_name(`string`): Filepath to the csv the raw data comes from
     '''
 
+    #Sheet names
+    raw_name    = sheet_names[0]
+    clean_name  = sheet_names[1]
+
+
+
+
+
 #----------------            Main            ----------------------- #
 
 def __main__():
+    names = csv_names()
+    create_csv(names)
 
+
+    #Credential authentication and API initialization
     credentials = get_credentials()
     http        = credentials.authorize(httplib2.Http())
-    service     = discovery.build('drive', 'v3', http=http)
+    drive       = discovery.build('drive', 'v3', http=http)
 
+
+    #NOTE: These are JSON object, not dicts
+    clean_spreadsheet = {
+            #TODO: Figure out how google processes this???
+            }
+
+    raw_spreadsheet   = {
+            #TODO: See above
+            }
+
+    create_raw   = drive.spreadsheet().create(body=raw_spreadsheet)
+    create_clean = drive.spreadsheet().create(body=clean_spreadsheet)
 
 __main__()
 
