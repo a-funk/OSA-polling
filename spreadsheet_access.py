@@ -8,34 +8,76 @@ Input : Script should run on an inputted DF (most likely a pandas DF)
 Output : A modified Google Docs sheet, with raw data and data analysis columns
 '''
 
+from __future__ import print_function
 import datetime
 
 start_time = datetime.datetime.now() #Testing runtime
 
 #import googleapiclient.discovery as d_api #stands for drive api; to help manage files and whatnot
 import pandas as pd
-import gspread  #separate google api to help manage spreadsheets
-from oauth2client.service_account import ServiceAccountCredentials
 from clean import clean
+
+
+# ------------------- Google Imports ----------------------#
+
+import httplib2  #library to make https requests (internet connectivity)
+import os        #OS lib - pretty self explanitory
+
+import gspread                          #separate google api to help manage spreadsheets
+from apiclient import discovery         #Various authentication libraries and drive api's
+from oauth2client import client
+from oauth2client import tools
+from oauth2client.file import Storage
 
 import_time = datetime.datetime.now()
 
+# -------------- Credentials generator ---------------------#
+
+try:
+    import argparse
+    flags = argparse.ArgumentParser(parents=[tools.argparser]).parse_args()
+except ImportError:
+        flags = None
+
+# If modifying these scopes, delete your previously saved credentials
+# at ~/.credentials/drive-python-quickstart.json
+SCOPES = 'https://www.googleapis.com/auth/drive'
+CLIENT_SECRET_FILE = 'client_secret.json'
+APPLICATION_NAME = 'AS Data Management'
 
 
-'''
-The majority of runtime happens for import calls
-averaging somewhere between 5 - 7 seconds
-'''
+def get_credentials():
+    """Gets valid user credentials from storage.
 
-#---------------- API Calls to manage spreadsheet ------------------#
+    If nothing has been stored, or if the stored credentials are invalid,
+    the OAuth2 flow is completed to obtain the new credentials.
 
-def authenticate():
-    scope = ['https://www.googleapis.com/auth/drive'] #This is a very dangerous scope to call, this probably should not be pushed to deployment
-    creds = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
-    client = gspread.authorize(creds)
-    print ("Connection authenticated")
-    return client
+    Returns:
+    Credentials, the obtained credential.
+    """
+    home_dir = os.path.expanduser('~')
+    credential_dir = os.path.join(home_dir, '.credentials')
+    if not os.path.exists(credential_dir):
+        os.makedirs(credential_dir)
+        credential_path = os.path.join(credential_dir,
+                                        'drive-python-quickstart.json')
 
+    else:
+        credential_path = os.path.join(credential_dir,
+                                       'client_secret.json')
+
+    store = Storage(credential_path)
+    credentials = store.get()
+
+    flow = client.flow_from_clientsecrets(CLIENT_SECRET_FILE, SCOPES)
+    flow.user_agent = APPLICATION_NAME
+    
+    if flags:
+        credentials = tools.run_flow(flow, store, flags)
+    else: # Needed only for compatibility with Python 2.6
+        credentials = tools.run(flow, store)
+    print('Storing credentials to ' + credential_path)
+    return credentials
 
 #----------------       File Management     -------------------------#
 
@@ -79,31 +121,15 @@ def create_csv(sheet_names, csv_name, oauth_obj):
         sp_name_2(`string`): Name of the spreadsheet to write clean data to
         csv_name(`string`): Filepath to the csv the raw data comes from
     '''
-    client = oauth_obj
-
-    raw_sheet_name, clean_sheet_name = sheet_names
-
-    raw_sheet   = client.create(raw_sheet_name)   #Named google sheet "Raw Datasheet   + Date"
-    clean_sheet = client.create(clean_sheet_name) #Names google sheet "Clean Datasheet + Date"
-    print ("Connecting to sheets to edit --- DONE")
-
-    raw_data = pd.read_csv(csv_name)
-    client.import_csv(raw_sheet.id, raw_data.to_csv())
-    print("Printing CSV to Google sheet --- DONE ")
-
-    clean_data = clean(raw_data)
-    print("Cleaning data --- DONE")
-    clean_csv = clean_data.to_csv()
-    client.import_csv(clean_sheet.id, clean_csv)   #TODO: change this to write to a different spreadsheet 
-    print("Printing clean CSV to Google sheet --- DONE")
 
 #----------------            Main            ----------------------- #
 
 def __main__():
-    oauth = authenticate()  #returns an oauth object needed to verify the connection to make api calls
-    names = csv_names()     #returns a tuples of strings; ("Clean Datasheet + Date", "Raw Datasheet + Date")
 
-    create_csv(names, 'approval_polllist.csv', oauth) #initalizes 2 spreadsheets on google drive with respective clean/raw names. 
+    credentials = get_credentials()
+    http        = credentials.authorize(httplib2.Http())
+    service     = discovery.build('drive', 'v3', http=http)
+
 
 __main__()
 
