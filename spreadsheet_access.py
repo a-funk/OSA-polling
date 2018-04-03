@@ -16,14 +16,15 @@ start_time = datetime.datetime.now() #Testing runtime
 #import googleapiclient.discovery as d_api #stands for drive api; to help manage files and whatnot
 import pandas as pd
 from clean import clean
-
+import pprint
 
 # ------------------- Google Imports ----------------------#
 
 import httplib2  #library to make https requests (internet connectivity)
 import os        #OS lib - pretty self explanitory
 
-import gspread                          #separate google api to help manage spreadsheets
+import gspread                                #separate google api to help manage spreadsheets
+
 from googleapiclient import discovery         #Various authentication libraries and drive api's
 from oauth2client import client
 from oauth2client import tools
@@ -112,7 +113,7 @@ def csv_names():
     return (raw, clean)
 
 
-def create_csv(sheet_names, csv_name = None):
+def create_csv(sheet_names, csv_name):
     
     '''
     Writes raw data and cleaned data to the two given spreadsheets
@@ -128,33 +129,36 @@ def create_csv(sheet_names, csv_name = None):
 
 
 
-
-
 #----------------            Main            ----------------------- #
 
 def __main__():
-    names = csv_names()
-    create_csv(names)
+    raw_sheet_name, clean_sheet_name = csv_names()
 
+    csv_filepath = 'approval_polllist.csv' 
 
     #Credential authentication and API initialization
     credentials = get_credentials()
     http        = credentials.authorize(httplib2.Http())
-    drive       = discovery.build('drive', 'v3', http=http)
+    drive       = discovery.build('drive', 'v3', credentials=credentials)
 
 
-    #NOTE: These are JSON object, not dicts
-    clean_spreadsheet = {
-            #TODO: Figure out how google processes this???
-            }
+    raw_data   = pd.read_csv(csv_filepath)
+    print("CSV READ AND CONVERTED TO DF")
+    clean_data = clean(raw_data) 
+    print("CLEANED DF CREATED")
 
-    raw_spreadsheet   = {
-            #TODO: See above
-            }
+    raw_sp_body   = raw_data.to_json()
+    clean_sp_body = clean_data.to_json()
 
-    create_raw   = drive.spreadsheet().create(body=raw_spreadsheet)
-    create_clean = drive.spreadsheet().create(body=clean_spreadsheet)
+    #print("\n", pprint.pprint(raw_sp_body))
+    #print("\n", pprint.pprint(clean_sp_body))
 
+#    doesn't work for whatever reason
+    create_raw   = drive.files().create(body=raw_sp_body)
+    create_clean = drive.files().create(body=clean_sp_body)
+
+    response_one = create_raw.execute()
+    response_two = create_clean.execute()
 __main__()
 
 #----------------      Runtime Analsysis     ------------------------ #
