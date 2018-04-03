@@ -147,18 +147,19 @@ def __main__():
     clean_data = clean(raw_data) 
     print("CLEANED DF CREATED")
 
+    #creates JSON files to be passed to drive API
     raw_sp_body   = raw_data.to_json()
     clean_sp_body = clean_data.to_json()
 
-    #print("\n", pprint.pprint(raw_sp_body))
-    #print("\n", pprint.pprint(clean_sp_body))
-
-#    doesn't work for whatever reason
+    #Initializes files to be created on google drive
     create_raw   = drive.files().create(body=raw_sp_body)
     create_clean = drive.files().create(body=clean_sp_body)
 
+    #Creates files on google drive
     response_one = create_raw.execute()
     response_two = create_clean.execute()
+
+
 __main__()
 
 #----------------      Runtime Analsysis     ------------------------ #
