@@ -97,7 +97,7 @@ def showCorr(df,n=5):
 #                cmap=sns.diverging_palette(220, 10, as_cmap=True), 
 #                square=True)
   
-    corr = get_top_abs_correlations(pd.get_dummies(clean_data),n).reset_index()
+    corr = get_top_abs_correlations(pd.get_dummies(df),n).reset_index()
     corr["Pairing"] = corr['level_0'] + corr['level_1']
     sns.barplot(data=corr,x="Pairing", y=0)
     
